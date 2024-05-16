@@ -6,7 +6,7 @@ import os
 load_dotenv()  # take environment variables from .env.
 
 ID    = 0
-URL   = "http://localhost:5000/api/v1/account"
+URL   = "void(url)"
 TOKEN = "fkskfjsfkjsfs"
 NAME  = "Hello"
 SPEC  = "Some spec"
@@ -42,9 +42,13 @@ def mock_auth_account():
         "name" : input_name,
         "key"  : input_key
     };
-    response = requests.post(URL+"/auth?api_key="+TOKEN,json=input_account)
 
-    print(response.json())
+    url = "http://localhost:5000/auth"
+    response = requests.post(url,json=input_account)
+
+    # this endpoint doesn't return a json object,
+    # we must read the bytes.
+    print(response.content)
     print("@mock_auth_account [end]")
 
 def mock_update_account():
@@ -53,36 +57,40 @@ def mock_update_account():
     naccount = {
         "spec" : "somethign new"
     };
-    response = requests.put(URL+'/'+str(ID)+"?api_key="+TOKEN,json=naccount)
+
+    url = "http://localhost:5000/account/update?id="+str(ID)
+    response = requests.put(url,json=naccount)
     
-    print(response.json())
+    print(response.status_code)
+    print(response.content)
     print("@mock_update_account [end]")
 
-def mock_get_all_accounts():
-    print("@mock_get_all_accounts")
 
-    response = requests.get(URL+"/?api_key="+TOKEN)
 
-    print(response.json())
-    print("@mock_get_all_accounts [end]")
+
 
 def mock_create_config():
     print("@mock_create_config")
 
     global IDC
-
     input_config = {
         "name" : "somenameconfig",
         "states" : [],
         "intents": []
     };
-    response = requests.post(URL+"/"+str(ID)+"/config?api_key="+TOKEN,json=input_config)
+
+    url      = "http://localhost:5000/config/create?id="+str(ID)
+    response = requests.post(url,json=input_config)
     IDC      = response.json()["id"]
 
     print(response.json())
     print("@mock_create_config [end]")
 
 
+
+
+
+## @Incomplete to test more.
 def mock_udpate_config():
     print("mock_update_config")
 
@@ -105,16 +113,22 @@ def mock_udpate_config():
         "states" : nstates
     };
 
-    response = requests.put(URL+"/config/"+str(IDC)+"?api_key="+TOKEN,json=input_config)
+    url = "http://localhost:5000/config/update?id="+str(IDC)
+    response = requests.put(url,json=input_config)
 
-    print(response.json())
+    print(response.content)
     print("mock_update_config [end]")
 
+
+
+
+## @Incomplete to test more.
 def mock_config_delete():
     print("@mock_config_delete")
 
     global IDC
-    response = requests.delete(URL+"/config/"+str(IDC)+"?api_key="+TOKEN)
+    url = "http://localhost:5000/config/delete?id="+str(IDC)
+    response = requests.delete(url)
 
     print(response.content)
     print("@mock_config_delete [end]")
@@ -123,9 +137,10 @@ def mock_get_all_configs():
     print("@mock_get_all_configs")
 
     global ID
-    response = requests.get(URL+"/"+str(ID)+"/config?api_key="+TOKEN)
+    url = "http://localhost:5000/config/all?id="+str(ID)
+    response = requests.get(url)
 
-    print(response.json())
+    print(response.content)
     print("@mock_get_all_configs [end]")
 
 def mock_account_delete():
@@ -138,10 +153,8 @@ def mock_account_delete():
     print("@mock_account_delete [end]")
 
 if __name__ == "__main__":
+
     mock_create_account()
-    """
-    print("\n")
-    mock_get_all_accounts()
     print("\n")
     mock_auth_account()
     print("\n")
@@ -154,6 +167,17 @@ if __name__ == "__main__":
     mock_get_all_configs()
     print("\n")
     mock_config_delete()
+
+    """
+    print("\n")
+    mock_get_all_accounts()
+    mock_config_delete()
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
+    print("\n")
     print("\n")
     mock_account_delete()
     print("\n")

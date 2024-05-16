@@ -268,15 +268,15 @@ public class ProdBot {
 
     xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.POST, "/config/create",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
-
+      System.out.println("||||||||||||||||||||||||||||");
+      System.out.println("@/config/create");
+      System.out.println("||||||||||||||||||||||||||||");
       try {
         final JsonObject config_obj    = content.getAsJsonObject();
         final String id                = params.get(0).getValue();
         final URL url                  = new URL(String.format("http://localhost:8080/api/v1/account/%s/config?api_key=%s",id,token));
 
-        make_request_post_at_with(url, config_obj);
-
-        return null;
+        return make_request_post_at_with(url, config_obj);
       } catch (Exception e) {
         System.out.println(e);
       }
@@ -286,12 +286,16 @@ public class ProdBot {
 
     xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.POST, "/auth",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      System.out.println("||||||||||||||||||||||||||||");
+      System.out.println("@/auth");
+      System.out.println("||||||||||||||||||||||||||||");
       try {
         final JsonObject account = content.getAsJsonObject();
         final URL url            = new URL(String.format("http://localhost:8080/api/v1/account/auth?api_key=%s",token));
 
         return make_request_post_at_with(url, account);
       } catch (Exception e) {
+        System.out.println("@/auth");
         System.out.println(e);
       }   
 
@@ -301,38 +305,76 @@ public class ProdBot {
     // for testing
     xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.GET, "/ping",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      System.out.println("||||||||||||||||||||||||||");
+      System.out.println("@/ping");
+      System.out.println("||||||||||||||||||||||||||");
       JsonObject statusObject = new JsonObject();
       statusObject.addProperty("msg", "pong");
       return statusObject;
     }));
 
-
-    // @Incomplete
-    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.POST, "/config",
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.DELETE, "/config/delete",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      System.out.println("||||||||||||||||||||||||||||");
+      System.out.println("@/config/delete");
+      System.out.println("||||||||||||||||||||||||||||");
 
-      /*
-      final JsonObject key_obj = content.getAsJsonObject();
-      final String key         = sha256_encrypt_str(key_obj.get("key").getAsString());
+      try {
+        final String id          = params.get(0).getValue();
+        final URL url            = new URL(String.format("http://localhost:8080/api/v1/account/config/%s?api_key=%s", id, token));
 
-      System.out.println("@key " + key_obj);
+        return make_request_delete_at_with(url);
+      } catch (Exception e) {
+        System.out.println("@/config/delete");
+        System.out.println(e);
+      }
 
-      final Result result           = find_account_by_key_content_hashed ( key );
-      JsonObject statusObject       = new JsonObject();
-      final JsonElement config_json = (JsonObject) new Gson().toJsonTree( result.account.get().getConfig(), Config.class );
-
-      statusObject.addProperty("msg", result.info);
-      statusObject.add("config", config_json);
-      statusObject.addProperty("status", result.code == Status.OK ? 200 : 404 );
-      */
-
-      return /*statusObject*/ null;
+      return null;
     }));
 
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.GET, "/config/all",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      System.out.println("||||||||||||||||||||||||||||");
+      System.out.println("@/config/all");
+      System.out.println("||||||||||||||||||||||||||||");
 
-    // @Incomplete to test.
+      try {
+        final String id          = params.get(0).getValue();
+        final URL url            = new URL(String.format("http://localhost:8080/api/v1/account/%s/config?api_key=%s", id, token));
+
+        return make_request_get_at_with(url);
+      } catch (Exception e) {
+        System.out.println("@/config/all");
+        System.out.println(e);
+      }
+
+      return null;
+    }));
+
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.PUT, "/config/update",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      System.out.println("|||||||||||||||||||||||||||||||||||||");
+      System.out.println("@/config/update");
+      System.out.println("|||||||||||||||||||||||||||||||||||||");
+      try {
+        final JsonObject config = content.getAsJsonObject();
+        final String id         = params.get(0).getValue();
+        final URL url           = new URL(String.format("http://localhost:8080/api/v1/account/%s/config?api_key=%s", id, token));
+
+        return make_request_put_at_with(url, config);
+      } catch (Exception e) {
+        System.out.println("@/config/update path");
+        System.out.println(e);
+      }
+
+      return null;
+    }));
+
     xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.POST, "/account/create",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      System.out.println("|||||||||||||||||||||||||||||||||||||");
+      System.out.println("@/account/create");
+      System.out.println("|||||||||||||||||||||||||||||||||||||");
       try {
         final JsonObject account = content.getAsJsonObject();
         final URL url            = new URL(String.format("http://localhost:8080/api/v1/account/?api_key=%s",token));
@@ -346,29 +388,71 @@ public class ProdBot {
       return null;
     }));
 
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.PUT, "/account/update",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      System.out.println("|||||||||||||||||||||||||||||||||||||");
+      System.out.println("@/account/update");
+      System.out.println("|||||||||||||||||||||||||||||||||||||");
+      try {
+        final JsonObject account = content.getAsJsonObject();
+        final String id          = params.get(0).getValue();
+
+        System.out.println("@id " + id);
+        System.out.println("@account : "+account);
+
+        final URL url            = new URL(String.format("http://localhost:8080/api/v1/account/%s?api_key=%s", id, token));
+
+        return make_request_put_at_with(url, account);
+      } catch (Exception e) {
+        System.out.println("@/account/update path");
+        System.out.println(e);
+      }
+
+      return null;
+    }));
 
 
     // OPTIONS
-    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/get-config",
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/config/all",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
       JsonObject statusObject = new JsonObject();
       return statusObject;
     }));
-    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/login",
-    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
-      System.out.println("@login path");
-      JsonObject statusObject = new JsonObject();
-      return statusObject;
-    }));
-    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/account",
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/auth",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
       JsonObject statusObject = new JsonObject();
       return statusObject;
     }));
-    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/persist-config",
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/account/create",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
       JsonObject statusObject = new JsonObject();
       return statusObject;
     }));
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/account/update",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      JsonObject statusObject = new JsonObject();
+      return statusObject;
+    }));
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/config/update",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      JsonObject statusObject = new JsonObject();
+      return statusObject;
+    }));
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/config/create",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      JsonObject statusObject = new JsonObject();
+      return statusObject;
+    }));
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/ping",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      JsonObject statusObject = new JsonObject();
+      return statusObject;
+    }));
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.OPTIONS, "/config/delete",
+    RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
+      JsonObject statusObject = new JsonObject();
+      return statusObject;
+    }));
+
   }
 }

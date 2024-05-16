@@ -130,12 +130,13 @@ public class DemoBot {
 
     final long curr = System.nanoTime();
 
-    // take the current config
-    final List<State> states = ContainerLocal.current.getStates();
-    final List<Intent> intents = ContainerLocal.current.getIntents();
+    // inti config states and intents in order to avoid the null ptr
+    
+    ContainerLocal.current.setStates(new ArrayList<State>());
+    ContainerLocal.current.setIntents(new ArrayList<Intent>());
 
-    final IntentMandatoryTrainingSentenceStep[] imtss = new IntentMandatoryTrainingSentenceStep[intents.size()];
-    final BodyStep[] bss                              = makeBodyStepArr( StateLocal.awaitingInput, StateLocal.reactPlatform, states, imtss );
+    final IntentMandatoryTrainingSentenceStep[] imtss = new IntentMandatoryTrainingSentenceStep[ContainerLocal.current.getIntents().size()];
+    final BodyStep[] bss                              = makeBodyStepArr( StateLocal.awaitingInput, StateLocal.reactPlatform, ContainerLocal.current.getStates(), imtss );
     StateLocal.awaitingInput                          = constructGM( imtss );
 
     // finished the parsing

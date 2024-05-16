@@ -3,7 +3,6 @@ package com.xatkit.example.helpers;
 import java.io.*;
 import java.net.*;
 import java.security.*;
-
 import com.google.gson.*;
 import com.xatkit.example.helpers.Tuteur;
 import com.google.common.hash.*;
@@ -565,13 +564,17 @@ public final class Utils
 
       byte[] input = jsonInputString.getBytes("utf-8");
       os.write(input, 0, input.length);			
+      os.close();
 
       BufferedReader br      = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
-      StringBuilder response = new StringBuilder(); String responseLine = null;
+      StringBuilder response = new StringBuilder();
+      String responseLine = null;
 
       while ((responseLine = br.readLine()) != null) {
         response.append(responseLine.trim());
       }
+
+      br.close(); // do it manually since we're not using the try-resource.
 
       return new JsonParser().parse(response.toString()).getAsJsonObject();
     } catch (Exception e) {
@@ -582,7 +585,112 @@ public final class Utils
     return null;
   }
 
-  public static void make_request_get_at_with(URL url, JsonObject object) {
+
+  public static JsonObject make_request_put_at_with(URL url, JsonObject object) {
+    System.out.println("@make_request_put_at_with with obj "+object);
+
+    try {
+      HttpURLConnection con = (HttpURLConnection)url.openConnection();
+      con.setRequestMethod("PUT");
+      con.setRequestProperty("Content-Type", "application/json");
+      con.setRequestProperty("Accept", "application/json");
+      con.setDoOutput(true);
+
+      String jsonInputString = object.toString();
+      OutputStream os        = con.getOutputStream();
+
+      // writing
+      byte[] input = jsonInputString.getBytes("utf-8");
+      os.write(input, 0, input.length);			
+      os.close();
+
+      // reading
+      BufferedReader br      = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+      StringBuilder response = new StringBuilder(); 
+      String responseLine    = null;
+
+      while ((responseLine = br.readLine()) != null) {
+        response.append(responseLine.trim());
+      }
+
+      br.close(); // do it manually since we're not using the try-resource.
+
+      return new JsonParser().parse(response.toString()).getAsJsonObject();
+    } catch (Exception e) {
+      System.out.println("@make_request_put_at_with");
+      System.out.println(e);
+    }
+
+    return null;
+  }
+
+  public static JsonObject make_request_delete_at_with(URL url) {
+    System.out.println("@make_request_delete_at_with (without obj)");
+
+    try {
+      HttpURLConnection con = (HttpURLConnection)url.openConnection();
+      con.setRequestMethod("DELETE");
+      con.setRequestProperty("Content-Type", "application/json");
+      con.setRequestProperty("Accept", "application/json");
+
+      try(BufferedReader br = new BufferedReader(
+        new InputStreamReader(con.getInputStream(), "utf-8"))) {
+        StringBuilder response = new StringBuilder();
+        String responseLine = null;
+        while ((responseLine = br.readLine()) != null) {
+          response.append(responseLine.trim());
+        }
+
+        return new JsonParser().parse(response.toString()).getAsJsonObject();
+      }
+    } catch (Exception e) {
+      System.out.println("@make_request_delete_at_with (without obj)");
+      System.out.println(e);
+    }
+
+    return null;
+  }
+
+  // surely it'will be an arrayList
+  public static JsonObject make_request_get_at_with(URL url) {
+    System.out.println("@make_request_get_at_with (without obj)");
+
+    try {
+      HttpURLConnection con = (HttpURLConnection)url.openConnection();
+      con.setRequestMethod("GET");
+      con.setRequestProperty("Content-Type", "application/json");
+      con.setRequestProperty("Accept", "application/json");
+
+      try(BufferedReader br = new BufferedReader(
+        new InputStreamReader(con.getInputStream(), "utf-8"))) {
+        StringBuilder response = new StringBuilder();
+        String responseLine = null;
+        while ((responseLine = br.readLine()) != null) {
+          response.append(responseLine.trim());
+        }
+
+        boolean is_json_array = new JsonParser().parse(response.toString()).isJsonArray();
+        if (is_json_array) {
+          JsonObject ret  = new JsonObject();
+          JsonArray  rett = new JsonParser().parse(response.toString()).getAsJsonArray();
+          ret.add("configs", rett);
+
+          return ret;
+        } else {
+          return new JsonParser().parse(response.toString()).getAsJsonObject();
+        }
+      }
+    } catch (Exception e) {
+      System.out.println("@make_request_get_at_with (without obj)");
+      System.out.println(e);
+    }
+
+    return null;
+  }
+
+  public static JsonObject make_request_get_at_with(URL url, JsonObject object) {
+    System.out.println("@make_request_get_at_with with "+object);
+
     try {
       HttpURLConnection con = (HttpURLConnection)url.openConnection();
       con.setRequestMethod("GET");
@@ -605,11 +713,13 @@ public final class Utils
           response.append(responseLine.trim());
         }
 
-        System.out.println(response.toString());
+        return new JsonParser().parse(response.toString()).getAsJsonObject();
       }
     } catch (Exception e) {
+      System.out.println("@make_request_get_at_with");
       System.out.println(e);
     }
 
+    return null;
   }
 }
