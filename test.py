@@ -26,7 +26,7 @@ def mock_create_account():
 
     url = "http://localhost:5000/account/create";
     response = requests.post(url,json=account)
-    ID       = 3
+    ID       = 1
 
     print(response.content)
     print("@mock_create_account [end]")
@@ -64,8 +64,6 @@ def mock_update_account():
     print(response.status_code)
     print(response.content)
     print("@mock_update_account [end]")
-
-
 
 
 
@@ -122,16 +120,23 @@ def mock_udpate_config():
 
 
 
+
+
 ## @Incomplete to test more.
 def mock_config_delete():
     print("@mock_config_delete")
 
     global IDC
-    url = "http://localhost:5000/config/delete?id="+str(IDC)
-    response = requests.delete(url)
+    url      = "http://localhost:5000/config/delete?id="+str(IDC)
+    response = requests.get(url)
 
     print(response.content)
     print("@mock_config_delete [end]")
+
+
+
+
+
 
 def mock_get_all_configs():
     print("@mock_get_all_configs")

@@ -652,7 +652,7 @@ public final class Utils
   }
 
   // surely it'will be an arrayList
-  public static JsonObject make_request_get_at_with(URL url) {
+  public static JsonObject make_request_get_at_with(URL url, String key_name) {
     System.out.println("@make_request_get_at_with (without obj)");
 
     try {
@@ -673,7 +673,7 @@ public final class Utils
         if (is_json_array) {
           JsonObject ret  = new JsonObject();
           JsonArray  rett = new JsonParser().parse(response.toString()).getAsJsonArray();
-          ret.add("configs", rett);
+          ret.add(key_name, rett);
 
           return ret;
         } else {

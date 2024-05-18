@@ -46,8 +46,6 @@ public class ProdBot {
   private static final String token = Dotenv.configure().directory(".").filename("env").load().get("token").trim(); 
 
   static {
-    // change if you want to go to prod
-    // conn( /* TypeRun.PROD */ TypeRun.DEV);
   }
 
   private static void shut() {
@@ -74,7 +72,6 @@ public class ProdBot {
     ReactIntentProvider reactIntentProvider = StateProd.reactPlatform.getReactIntentProvider();
     StateProd.awaitingInput                 = state("AwaitingInput");
 
-    final long curr = System.currentTimeMillis();
 
     // taking all the configs.
     // of all the users.
@@ -84,29 +81,57 @@ public class ProdBot {
     final ArrayList<Account> accs   = vomit();
     */
 
-    final ArrayList<Intent> intents = new ArrayList<>();
-    final ArrayList<State> states   = new ArrayList<>();
+    ArrayList<Intent> intents = new ArrayList<>();
+    ArrayList<State> states   = new ArrayList<>();
 
-    /*
-    for ( Account acc : accs ) {
-      for ( State_ state : acc.getConfig().states ) { 
-        states.add ( state ); 
+    final long curr_ = System.nanoTime();
+    final long curr  = System.nanoTime();
+
+    try {
+      URL url            = new URL("http://localhost:8080/api/v1/account/?api_key="+token);
+      JsonArray obj      = make_request_get_at_with(url, "accounts").getAsJsonArray("accounts");
+      Account[] accounts = new Gson().fromJson(obj.toString(), Account[].class);
+
+      for (Account account:accounts) {
+        long id = account.getId().longValue();
+
+        url              = new URL(String.format("http://localhost:8080/api/v1/account/%d/config?api_key=%s", id, token));
+        obj              = make_request_get_at_with(url, "configs").getAsJsonArray("configs");
+        Config[] configs = new Gson().fromJson(obj.toString(), Config[].class);
+
+        for (Config config:configs) {
+          for (Intent intent:config.getIntents()) {
+            intents.add(intent);
+          }
+          for (State state:config.getStates()) {
+            states.add(state);
+          }
+        }
       }
-      for ( Intent intent : intents ) { 
-        intents.add ( intent ); 
-      }
+
+    } catch (Exception e) {
+      System.out.println("|||||||||||||||||||||||||||");
+      System.out.println("@computing all accounts");
+      System.out.println("|||||||||||||||||||||||||||");
+      System.out.println("@e "+e);
     }
-    */
+    
+    final long end_ = System.nanoTime();
+
+    System.out.println("-------------------------------|||||||||||||||||||||||||||||||||--------------------------------");
+    System.out.println("@Loading took " + ((end_ - curr_)/1_000_000) + " ms.");
+    System.out.println("-------------------------------|||||||||||||||||||||||||||||||||--------------------------------");
 
     final IntentMandatoryTrainingSentenceStep[] imtss = new IntentMandatoryTrainingSentenceStep[intents.size()];
     final BodyStep[] bss                              = makeBodyStepArr( StateProd.awaitingInput, StateProd.reactPlatform, states, imtss );
     StateProd.awaitingInput                           = constructGM( imtss );
 
-    final long end = System.currentTimeMillis();
+    final long end = System.nanoTime();
 
     System.out.println("-------------------------------|||||||||||||||||||||||||||||||||--------------------------------");
-    System.out.println("@Parsing took " + (end - curr) + " ms.");
+    System.out.println("@Parsing took " + ((end - curr)/1_000_000) + " ms.");
     System.out.println("-------------------------------|||||||||||||||||||||||||||||||||--------------------------------");
+
 
     // defaults
     // feel free to improve those ***Intents_.java***
@@ -313,7 +338,7 @@ public class ProdBot {
       return statusObject;
     }));
 
-    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.DELETE, "/config/delete",
+    xatkitBot.getXatkitServer().registerRestEndpoint(HttpMethod.GET, "/config/delete",
     RestHandlerFactory.createJsonRestHandler((headers, params, content) -> {
       System.out.println("||||||||||||||||||||||||||||");
       System.out.println("@/config/delete");
@@ -339,10 +364,10 @@ public class ProdBot {
       System.out.println("||||||||||||||||||||||||||||");
 
       try {
-        final String id          = params.get(0).getValue();
-        final URL url            = new URL(String.format("http://localhost:8080/api/v1/account/%s/config?api_key=%s", id, token));
+        final String id = params.get(0).getValue();
+        final URL url   = new URL(String.format("http://localhost:8080/api/v1/account/%s/config?api_key=%s", id, token));
 
-        return make_request_get_at_with(url);
+        return make_request_get_at_with(url, "configs");
       } catch (Exception e) {
         System.out.println("@/config/all");
         System.out.println(e);
