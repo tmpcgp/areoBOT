@@ -446,7 +446,7 @@ public final class Utils
     public static IntentMandatoryTrainingSentenceStep makeIntent(Intent intent, IntentMandatoryTrainingSentenceStep[] imss) {
       System.out.println("@makeIntent");
 
-      final String name          = intent.getName();
+      final String name     = intent.getName();
       final List<String> ts = intent.getTrainingSentences();
 
       System.out.println("@ts " + ts);
@@ -473,7 +473,6 @@ public final class Utils
       String intent_name     = state.getOnIntent().getName();
       List<Choice> arrc = state.getChoices();
       List<String> arra = state.getAnswers();
-
 
       BodyStep ret                               = state ("Handle-" + intent_name);
       IntentMandatoryTrainingSentenceStep intent = makeIntent(state.getOnIntent(), imss);
@@ -517,6 +516,11 @@ public final class Utils
     // construct the default global mapper state ( which is the awaiting Input state )
     // that method must be called after all the processing ( makeBodyArr, makeIntentArr ).
     public static BodyStep constructGM( IntentMandatoryTrainingSentenceStep[] arr ) {
+      System.out.println("||||||||||||||||||||||||||||||||||||||");
+      System.out.println("||||||||||||||||||||||||||||||||||||||");
+      System.out.println("@mapping >> "+mapping);
+      System.out.println("||||||||||||||||||||||||||||||||||||||");
+      System.out.println("||||||||||||||||||||||||||||||||||||||");
 
       final int usize        = arr.length;
       BodyStep awaitingInput = state("AwaitingInput");
@@ -527,17 +531,10 @@ public final class Utils
         return awaitingInput;
       }
       else {
-        TransitionStep ts    = awaitingInput.next();
+        System.out.println("@here");
 
-        System.out.println("@ts " + ts);
-        System.out.println("@arr[0] " + arr[0]);
-        System.out.println("@mapping_get(arr[0])" + mapping.get(arr[0]));
-
-        OptionalWhenStep ows = ts.when(intentIs(arr[0])).moveTo(mapping.get(arr[0])); 
-        System.out.println("@ows " + ows);
-
-        for ( int i = 1; i < usize; i++ ) {
-          ows = ows.when(intentIs(arr[i])).moveTo(mapping.get(arr[i]));
+        for ( int i = 0; i < usize; i++ ) {
+          awaitingInput.next().when(intentIs(arr[i])).moveTo(mapping.get(arr[i])); 
         }
         return awaitingInput;
       }

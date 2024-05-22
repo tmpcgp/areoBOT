@@ -127,13 +127,15 @@ public class DemoBot {
     ReactEventProvider reactEventProvider   = StateLocal.reactPlatform.getReactEventProvider();
     ReactIntentProvider reactIntentProvider = StateLocal.reactPlatform.getReactIntentProvider();
 
-
     final long curr = System.nanoTime();
 
     // inti config states and intents in order to avoid the null ptr
     
-    ContainerLocal.current.setStates(new ArrayList<State>());
-    ContainerLocal.current.setIntents(new ArrayList<Intent>());
+    if (ContainerLocal.current.getStates() == null) {
+      ContainerLocal.current.setStates(new ArrayList<State>());
+    } if (ContainerLocal.current.getIntents() == null) {
+      ContainerLocal.current.setIntents(new ArrayList<Intent>());
+    }
 
     final IntentMandatoryTrainingSentenceStep[] imtss = new IntentMandatoryTrainingSentenceStep[ContainerLocal.current.getIntents().size()];
     final BodyStep[] bss                              = makeBodyStepArr( StateLocal.awaitingInput, StateLocal.reactPlatform, ContainerLocal.current.getStates(), imtss );

@@ -10,8 +10,8 @@ const apiRouter = require('./routes/api')
 const server = express()
 const port = 6666
 
-server.use(express.json({limit: '50mb'}));
-server.use(express.urlencoded({limit: '50mb', extended: false}));
+server.use(express.json({limit: '100mb'}));
+server.use(express.urlencoded({limit: '100mb', extended: false}));
 server.use('/', indexRouter)
 server.use('/api', apiRouter)
 server.use(methodOverride())

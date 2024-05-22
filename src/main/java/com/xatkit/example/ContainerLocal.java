@@ -37,6 +37,7 @@ public final class ContainerLocal {
     @Override
     public void handle(HttpExchange t) throws IOException {
       System.out.println("@handling restartHandler");
+
       DemoBot.re();
 
       t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
